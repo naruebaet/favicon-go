@@ -22,6 +22,16 @@ go build -o favicon-go
 ./favicon-go -input your-image.png [-output favicons]
 ```
 
+## Alternative install
+```bash
+go install https://github.com/naruebaet/favicon-go
+```
+
+## Usage by global install
+```bash
+favicon-go -input your-image.png [-output favicons]
+```
+
 ### Parameters
 
 - `-input`: Required. Path to the input image (PNG, JPEG, etc.).

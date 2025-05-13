@@ -153,12 +153,7 @@ func generateManifest(outputDir string) {
   "display": "standalone"
 }`
 
-	outputPath := filepath.Join(outputDir, "site.webmanifest")
-	if err := os.WriteFile(outputPath, []byte(manifest), 0644); err != nil {
-		log.Fatalf("Failed to write manifest file: %v", err)
-	}
-
-	fmt.Printf("Created: %s\n", outputPath)
+	writeConfigFile(outputDir, "site.webmanifest", manifest)
 }
 
 func generateBrowserConfig(outputDir string) {
@@ -172,9 +167,13 @@ func generateBrowserConfig(outputDir string) {
     </msapplication>
 </browserconfig>`
 
-	outputPath := filepath.Join(outputDir, "browserconfig.xml")
-	if err := os.WriteFile(outputPath, []byte(config), 0644); err != nil {
-		log.Fatalf("Failed to write browserconfig file: %v", err)
+	writeConfigFile(outputDir, "browserconfig.xml", config)
+}
+
+func writeConfigFile(outputDir, filename, content string) {
+	outputPath := filepath.Join(outputDir, filename)
+	if err := os.WriteFile(outputPath, []byte(content), 0644); err != nil {
+		log.Fatalf("Failed to write %s file: %v", filename, err)
 	}
 
 	fmt.Printf("Created: %s\n", outputPath)
@@ -182,12 +181,52 @@ func generateBrowserConfig(outputDir string) {
 
 func printHtmlCode(outputDir string) {
 	relativePath := filepath.Base(outputDir)
-	htmlCode := fmt.Sprintf(`<link rel="apple-touch-icon" sizes="180x180" href="/%s/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/%s/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/%s/favicon-16x16.png">
-<link rel="manifest" href="/%s/site.webmanifest">
-<meta name="msapplication-config" content="/%s/browserconfig.xml">
-<meta name="theme-color" content="#ffffff">`, relativePath, relativePath, relativePath, relativePath, relativePath)
 
-	fmt.Println(htmlCode)
+	elements := []struct {
+		tag       string
+		attrs     map[string]string
+		selfClose bool
+	}{
+		{
+			tag:       "link",
+			attrs:     map[string]string{"rel": "apple-touch-icon", "sizes": "180x180", "href": fmt.Sprintf("/%s/apple-touch-icon.png", relativePath)},
+			selfClose: true,
+		},
+		{
+			tag:       "link",
+			attrs:     map[string]string{"rel": "icon", "type": "image/png", "sizes": "32x32", "href": fmt.Sprintf("/%s/favicon-32x32.png", relativePath)},
+			selfClose: true,
+		},
+		{
+			tag:       "link",
+			attrs:     map[string]string{"rel": "icon", "type": "image/png", "sizes": "16x16", "href": fmt.Sprintf("/%s/favicon-16x16.png", relativePath)},
+			selfClose: true,
+		},
+		{
+			tag:       "link",
+			attrs:     map[string]string{"rel": "manifest", "href": fmt.Sprintf("/%s/site.webmanifest", relativePath)},
+			selfClose: true,
+		},
+		{
+			tag:       "meta",
+			attrs:     map[string]string{"name": "msapplication-config", "content": fmt.Sprintf("/%s/browserconfig.xml", relativePath)},
+			selfClose: true,
+		},
+		{
+			tag:       "meta",
+			attrs:     map[string]string{"name": "theme-color", "content": "#ffffff"},
+			selfClose: true,
+		},
+	}
+
+	for _, elem := range elements {
+		html := "<" + elem.tag
+		for key, value := range elem.attrs {
+			html += fmt.Sprintf(` %s="%s"`, key, value)
+		}
+		if elem.selfClose {
+			html += ">"
+		}
+		fmt.Println(html)
+	}
 }

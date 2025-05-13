@@ -4,7 +4,6 @@ go 1.21
 
 require (
 	github.com/disintegration/imaging v1.6.2
-	github.com/mat/besticon v3.12.0+incompatible
 )
 
 require (
