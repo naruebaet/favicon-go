@@ -24,7 +24,7 @@ go build -o favicon-go
 
 ## Alternative install
 ```bash
-go install https://github.com/naruebaet/favicon-go
+go install https://github.com/naruebaet/favicon-go@latest
 ```
 
 ## Usage by global install
